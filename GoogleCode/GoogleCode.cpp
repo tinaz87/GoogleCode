@@ -6,59 +6,59 @@
 #include <stdint.h>
 
 struct nodo{
-	uint32_t pass;
-	bool complete;
-	int32_t NUM;
-	int32_t Position;
-	nodo* major;
-	nodo* minor;
-	nodo* father;
-	bool visited;
-	nodo* root;
-	int NUM_MIN;
-	nodo() :major(nullptr), minor(nullptr), complete(false), pass(0),root(nullptr),NUM_MIN(99999),visited(false){}
+	uint32_t mPass;
+	bool mComplete;
+	int32_t mNum;
+	int32_t mPosition;
+	nodo* mMajor;
+	nodo* mMinor;
+	nodo* mFather;
+	bool mVisited;
+	nodo* mRoot;
+	int mNumMin;
+	nodo() :mMajor(nullptr), mMinor(nullptr), mComplete(false), mPass(0),mRoot(nullptr),mNumMin(99999),mVisited(false){}
 };
 
 
-void getMyNeighborsPosition(const int table_length, const int32_t myPosition, int32_t& iTop, int32_t& iDown, int32_t& iLeft, int32_t& iRight){
+void getMyNeighborsPosition(const int iTableLength, const int32_t iMyPosition, int32_t& iTop, int32_t& iDown, int32_t& iLeft, int32_t& iRight){
 
-	if ( myPosition%table_length ==  table_length-1){ // sono sul bordo dx
+	if ( iMyPosition%iTableLength ==  iTableLength-1){ // sono sul bordo dx
 		iRight = -1;	
 	}
 	else{
-		iRight = (myPosition + 1);
+		iRight = (iMyPosition + 1);
 	}
-	if (myPosition < table_length){ // sono nella prima riga
+	if (iMyPosition < iTableLength){ // sono nella prima riga
 		iTop = -1;
 	}else
-		iTop = (myPosition - table_length);
+		iTop = (iMyPosition - iTableLength);
 
-	if (myPosition >= (table_length-1)*table_length ){ // sono nell' ultima riga
+	if (iMyPosition >= (iTableLength-1)*iTableLength ){ // sono nell' ultima riga
 		iDown = -1;
 	}else
-		iDown = (myPosition + table_length);
+		iDown = (iMyPosition + iTableLength);
 
-	if (myPosition%table_length==0){ // sono sul bord sx
+	if (iMyPosition%iTableLength==0){ // sono sul bord sx
 		iLeft = -1;
 	}else
-		iLeft = (myPosition - 1);
+		iLeft = (iMyPosition - 1);
 }
 #include <math.h>
 
 
 int setMinorMajor(const int iPos,nodo& iNodo, std::vector<nodo>& iNodiVec){
 
-	if (iNodo.major != nullptr && iNodo.minor != nullptr) return 0;
-	if (iPos >= 0 && abs(iNodiVec.at(iPos).NUM - iNodo.NUM) == 1){
-		if (iNodiVec.at(iPos).NUM > iNodo.NUM){
-			iNodo.major = &iNodiVec.at(iPos);
-			if (iNodo.major->father == nullptr)
-				iNodo.major->father = &iNodo;
+	if (iNodo.mMajor != nullptr && iNodo.mMinor != nullptr) return 0;
+	if (iPos >= 0 && abs(iNodiVec.at(iPos).mNum - iNodo.mNum) == 1){
+		if (iNodiVec.at(iPos).mNum > iNodo.mNum){
+			iNodo.mMajor = &iNodiVec.at(iPos);
+			if (iNodo.mMajor->mFather == nullptr)
+				iNodo.mMajor->mFather = &iNodo;
 		}			
 		else{
-			iNodo.minor = &iNodiVec.at(iPos);
-			if (iNodo.minor->father == nullptr)
-				iNodo.minor->father = &iNodo;
+			iNodo.mMinor = &iNodiVec.at(iPos);
+			if (iNodo.mMinor->mFather == nullptr)
+				iNodo.mMinor->mFather = &iNodo;
 		}
 			
 
@@ -80,40 +80,40 @@ void visit(std::vector<nodo>& iNodi, uint32_t nodo_position,nodo* root){
 
 	
 		nodo& mNodo = iNodi.at(nodo_position);
-		mNodo.visited = true;
-		if (mNodo.root==nullptr)
-			mNodo.root = root;
+		mNodo.mVisited = true;
+		if (mNodo.mRoot==nullptr)
+			mNodo.mRoot = root;
 
-		if (mNodo.root->NUM_MIN > mNodo.NUM)
-			mNodo.root->NUM_MIN = mNodo.NUM;
+		if (mNodo.mRoot->mNumMin > mNodo.mNum)
+			mNodo.mRoot->mNumMin = mNodo.mNum;
 
 
-		if (!mNodo.complete){
+		if (!mNodo.mComplete){
 			int mTop, mDown, mRight, mLeft;
 			mTop = mDown = mRight = mLeft = 0;
 
-			getMyNeighborsPosition(TABLE_LENGTH, mNodo.Position, mTop, mDown, mLeft, mRight);
+			getMyNeighborsPosition(TABLE_LENGTH, mNodo.mPosition, mTop, mDown, mLeft, mRight);
 
 			setMinorMajor(mTop, mNodo, iNodi);
 			setMinorMajor(mDown, mNodo, iNodi);
 			setMinorMajor(mLeft, mNodo, iNodi);
 			setMinorMajor(mRight, mNodo, iNodi);			
 			
-			if (!mNodo.complete){
-				if (mNodo.major != nullptr && mNodo.major->visited!=true/*( mNodo.father == nullptr || (mNodo.father != nullptr && mNodo.major->NUM != mNodo.father->NUM))*/){
+			if (!mNodo.mComplete){
+				if (mNodo.mMajor != nullptr && mNodo.mMajor->mVisited!=true/*( mNodo.father == nullptr || (mNodo.father != nullptr && mNodo.major->NUM != mNodo.father->NUM))*/){
 
-					visit(iNodi, mNodo.major->Position, root);
+					visit(iNodi, mNodo.mMajor->mPosition, root);
 				}
-				if (mNodo.minor != nullptr && mNodo.minor->visited != true/*( mNodo.father == nullptr || (mNodo.father != nullptr && mNodo.minor->NUM != mNodo.father->NUM))*/) {
+				if (mNodo.mMinor != nullptr && mNodo.mMinor->mVisited != true/*( mNodo.father == nullptr || (mNodo.father != nullptr && mNodo.minor->NUM != mNodo.father->NUM))*/) {
 
-					visit(iNodi, mNodo.minor->Position, root);
+					visit(iNodi, mNodo.mMinor->mPosition, root);
 				}
 
-				mNodo.complete = true;
-				root->pass++;
+				mNodo.mComplete = true;
+				root->mPass++;
 			}
 		}	
-		mNodo.pass = mNodo.root->pass;
+		mNodo.mPass = mNodo.mRoot->mPass;
 }
 #include <iostream>
 std::vector<int> mtable{ 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385,
@@ -159,9 +159,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	for each (int var in mtable)
 	{
 		nodo n;
-		n.NUM = var;
-		n.Position = mNodi.size();
-		n.father = nullptr;
+		n.mNum = var;
+		n.mPosition = mNodi.size();
+		n.mFather = nullptr;
 		mNodi.push_back(n);
 	}
 
@@ -171,17 +171,17 @@ int _tmain(int argc, _TCHAR* argv[])
 		visit(mNodi, idx , &mNodi.at(idx));
 
 		if (winner != nullptr){
-			if ( winner->pass <= mNodi.at(idx).pass && winner->root->NUM_MIN > mNodi.at(idx).root->NUM_MIN)
-				winner = mNodi.at(idx).root;
+			if ( winner->mPass <= mNodi.at(idx).mPass && winner->mRoot->mNumMin > mNodi.at(idx).mRoot->mNumMin)
+				winner = mNodi.at(idx).mRoot;
 		}else
 			winner = &mNodi.at(idx);
 
-		std::cout << "  "<<mNodi.at(idx).NUM ;
+		std::cout << "  "<<mNodi.at(idx).mNum ;
 		if (idx%TABLE_LENGTH == TABLE_LENGTH - 1)
 			std::cout << std::endl;
 	}
 
-	std::cout << "RADICE " << winner->NUM << " VINCENTE " << winner->NUM_MIN << " PASSI " << winner->root->pass<<std::endl;
+	std::cout << "RADICE " << winner->mNum << " VINCENTE " << winner->mNumMin << " PASSI " << winner->mRoot->mPass<<std::endl;
 	
 
 	system("pause");
